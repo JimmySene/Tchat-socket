@@ -7,13 +7,21 @@ const app = {
 
   messageReceived: (event) => {
     const data = JSON.parse(event.data);
-    const pseudo = data.pseudo;
-    const message = data.message;
-    
-    const li = document.createElement('li');
-    li.textContent = pseudo + ' : ' + message;
-    document.getElementById('messages').appendChild(li);
-    
+
+    if(Array.isArray(data)) {
+      
+      data.forEach(message => {
+        
+        const li = document.createElement('li');
+        li.textContent = message.pseudo + ' : ' + message.message;
+        document.getElementById('messages').prepend(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.textContent = data.pseudo + ' : ' + data.message;
+      document.getElementById('messages').prepend(li);
+    }
+      
   },
 
   sendMessage: (event) => {
@@ -21,6 +29,7 @@ const app = {
     const inputPseudo = document.getElementById('pseudo').value;
     const inputMessage = document.getElementById('message').value;
     if(inputPseudo != '' && inputMessage != '') app.socket.send(JSON.stringify({pseudo:inputPseudo, message:inputMessage}));
+    document.getElementById('message').value = '';
   }
 }
 
