@@ -18,20 +18,23 @@ ws_server.on('connection', (socket) => {
 
   console.log('Nouvelle connexion !');
 
-  Message.find().then(messages => {
-    socket.send(JSON.stringify(messages));
-  })
-  .catch(error => console.log(error));
-  
   socket.on('message', (message) => {
 
-    Message.create(JSON.parse(message)).then(() => {
+    Message.create(JSON.parse(message))
+    .then(() => {
       ws_server.clients.forEach(client => client.send(message));
     })
     .catch(error => console.log(error));
   
   });
 });
+
+app.get('/messages', (req, res) => {
+  Message.find()
+  .then(messages => res.json(messages))
+  .catch(error => console.log(error));
+});
+
 
 app.use(express.static('public'));
 
